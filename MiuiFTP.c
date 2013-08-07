@@ -8,12 +8,14 @@
 #define NOTFOUND 0
 #define Status int
 
+/** 小米FTP端口2121  */
+#define PORT 2121
 #define THREAD_NUM 20
 int flag = THREAD_NUM;
 HANDLE  ThreadEvent; /** 事件  */
 
 /**
-**  查找参数ip地址的2121端口是否开放
+**  查找参数ip地址的PORT端口是否开放
 **  返回值：FOUND; NOTFOUND;
 **/
 Status Search_mi(char* ip)
@@ -27,7 +29,7 @@ Status Search_mi(char* ip)
     SetEvent(ThreadEvent); /** 触发事件  */
 
     sa.sin_family=AF_INET;
-    sa.sin_port = htons(2121);/** 小米FTP端口2121  */
+    sa.sin_port = htons(PORT);
 
     int ret = 0,error = -1,len = sizeof(int);
     unsigned long ul = 1;
@@ -125,9 +127,11 @@ Status IPhead(char* ip)
 unsigned  __stdcall  thread_func(void *ip)
 {
     char cmd[50] = "explorer.exe ftp://";
+    char temp[5];
     strcat(cmd,(char *)ip);
-    strcat(cmd,":2121");
-
+    strcat(cmd,":");
+    itoa(PORT,temp,10);
+    strcat(cmd,temp);
     if(FOUND == Search_mi(ip))
     {
         system(cmd);
@@ -163,7 +167,7 @@ int main()
         char tmp[4] = "",ip[16] = "";
         strcat(ip,iphead);
         itoa(100 + i,tmp,10);
-        strcat(ip,tmp);/** 拼接上IP地址最后一段  */
+        strcat(ip,tmp);/** 拼接上IP地址最后一段 */
 
         /** 开THREAD_NUM个线程进行扫描  */
         handle[i] = (HANDLE)_beginthreadex(NULL,0,thread_func,ip,0,NULL);
