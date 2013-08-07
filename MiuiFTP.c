@@ -98,7 +98,6 @@ char* CheckIP(void)
 			{
 			    /** inet_ntoa()函数，将hostinfo结构变量中的h_addr_list转化为标准的点分表示的IP */
 				ip = inet_ntoa(*(struct in_addr *)*hostinfo->h_addr_list);
-
 				return ip;
 			}
 		}
