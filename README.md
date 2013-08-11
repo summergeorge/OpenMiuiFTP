@@ -1,6 +1,7 @@
 OpenMiuiFTP
 ===========
-
+####运行截图
+![Alt text](/path/to/img.jpg)
 ##功能：
 ####pc端自动打开MIUI远程管理FTP地址
 
