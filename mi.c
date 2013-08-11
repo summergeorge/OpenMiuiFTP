@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <winsock2.h>
 #include <process.h>
 
@@ -39,7 +37,7 @@ Status Search_mi(char* ip)
     if(connect(sock,(SOCKADDR *)&sa,sizeof(sa))== SOCKET_ERROR)
     {
         tout.tv_sec  = 0;
-        tout.tv_usec = 500*1000;/** 100毫秒;1秒 == 1000豪秒== 1000微秒;  */
+        tout.tv_usec = 800*1000;/** 100毫秒;1秒 == 1000豪秒== 1000微秒;  */
         FD_ZERO(&se);
         FD_SET(sock, &se);
         if( select(sock+1, NULL, &se, NULL, &tout) > 0)
@@ -125,7 +123,8 @@ Status IPhead(char* ip)
 
 unsigned  __stdcall  thread_func(void *ip)
 {
-    char cmd[50] = "explorer.exe ftp://";
+    //char cmd[50] = "explorer.exe ftp://";
+    char cmd[50] = "ftp://";
     char temp[5];
     strcat(cmd,(char *)ip);
     strcat(cmd,":");
@@ -133,7 +132,10 @@ unsigned  __stdcall  thread_func(void *ip)
     strcat(cmd,temp);
     if(FOUND == Search_mi(ip))
     {
-        system(cmd);
+        //system(cmd);
+       // MessageBox(NULL,cmd,"123",0);
+//ShellExecute(NULL,"open","explorer.exe",TEXT("ftp://192.168.1.101:2121"),NULL,SW_SHOWNORMAL);
+ShellExecute(NULL,"open","explorer.exe",cmd,NULL,SW_SHOWNORMAL);
     }
     else
     {
@@ -143,19 +145,14 @@ unsigned  __stdcall  thread_func(void *ip)
     return 0;
 }
 
-void UI(void)
-{
-    printf("\n\n\n\t\t\t没有找到小米手机！\n\n\n");
-    printf("\n请按下面方法检查：\n\n");
-    printf("\t1,手机和电脑 连的是同一个路由器吗 ？\n\n");
-    printf("\t2,手机上 -> 文件管理 -> 远程管理 -> 启动服务 已经打开了吗？ \n\n");
-    printf("\n\t如果你都回答: 是 ！\t还是打不开？请联系作者！！\n\n\t\t\t\thttp://www.yurfly.com\n\n\n");
-    system("pause");
-}
 
-int main()
+
+
+int WINAPI WinMain (HINSTANCE hThisInstance,
+                     HINSTANCE hPrevInstance,
+                     LPSTR lpszArgument,
+                     int nCmdShow)
 {
-    SetConsoleTitle("小米无线FTP！");
     ThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     char iphead[16] = "";
     IPhead(iphead);/** 获取网关IP地址前3段  */
@@ -174,7 +171,10 @@ int main()
     }
     WaitForMultipleObjects(THREAD_NUM, handle, TRUE,INFINITE);
     CloseHandle(ThreadEvent);/** 销毁事件  */
-    if(0 == flag) UI();
-
+    if(0 == flag)
+    {
+        char notfound[] = "请按下面方法检查：\n\n\t1, 手机和电脑 连接同一个路由器\n\t2, 打开小米手机 -> 文件管理 -> 远程管理 -> 启动服务";
+        MessageBox(NULL,notfound,TEXT("没有找到小米手机！"),MB_OK|MB_ICONWARNING);
+    }
     return 0;
 }
